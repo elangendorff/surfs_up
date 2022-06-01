@@ -15,8 +15,8 @@ engine = create_engine(f"sqlite://{filepath}/hawaii.sqlite")
 Base = automap_base()
 Base.prepare(engine, reflect=True)
 
-measurement = Base.classes.measurement
-station = Base.classes.station
+Measurement = Base.classes.measurement
+Station = Base.classes.station
 
 session = Session(engine)
 
@@ -54,12 +54,34 @@ version_prefix = '/api/v1.0'
 def welcome():
     return(
         f'''
-        Welcome to the Climate Analysis API!
-        Available Routes:
-        {version_prefix}/precipitation
-        {version_prefix}/stations
-        {version_prefix}/tobs
+        Welcome to the Climate Analysis API!<BR>
+        Available Routes:<BR>
+        {version_prefix}/precipitation<BR>
+        {version_prefix}/stations<BR>
+        {version_prefix}/tobs<BR>
         {version_prefix}/temp/start/end
         '''
     )
+
+@app.route(f"{version_prefix}/precipitation")
+
+def precipitation():
+    prev_year = dt.date(2017, 8, 23) - dt.timedelta(days=365)  # More precisely: 365.2425
+    precipitation = (
+        session.query(Measurement.date, Measurement.prcp)   # '''SELECT date, prcp FROM Measurement
+        .filter(prev_year <= Measurement.date)              # WHERE prev_year <= Measurement.date'''
+        .all()
+    )
+
+    precip = {date: prcp for date, prcp in precipitation}   # Convert the 2-tuples from precip into key-value dictionary pairs
+    
+    return jsonify(precip)
+
+@app.route(f"{version_prefix}/stations")
+
+def stations():
+    results = session.query(Station.station).all()  # 'SELECT station from Station' (outputs a list of tuples)
+    stations = list(np.ravel(results))              # np.ravel "flattens" the above into a single list of each element of the tuples in sequence
+
+    return jsonify(stations=stations)               # Even after consulting the documentation, I don't know what 'stations=stations' is doing
 

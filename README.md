@@ -1,4 +1,4 @@
-# Surf and Shake
+# Surf n' Shake
 
 ## Overview
 An examination of Oahu temperature data over several years in the months of June and December to determine if the *Surf n' Shake* surfing and ice cream shop is viable.

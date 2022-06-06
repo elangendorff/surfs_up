@@ -36,7 +36,7 @@ route = {
     'stats': f'<a href = "{version_prefix}/temp/">Statistics</a>'
 }
 
-prev_year = dt.date(2017, 8, 23) - dt.timedelta(days=365)   # More precisely: 365.2425
+prev_year = dt.date(2017, 8, 23) - dt.timedelta(days=365)   # Leap years?
 
 # 9.5.2 Create the Welcome Route
 @app.route("/") # The @ sign is a "listener" decoration.
@@ -71,9 +71,9 @@ def welcome():
 @app.route(f"{version_prefix}/precipitation")
 
 def precipitation():
-    # prev_year = dt.date(2017, 8, 23) - dt.timedelta(days=365)   # More precisely: 365.2425
+    # prev_year = dt.date(2017, 8, 23) - dt.timedelta(days=365)   # Leap years?
                                                                 # `prev_year` (with the same definition) gets used again in a later function,
-                                                                # so moving this definition to outside the function (defined above), instead.
+                                                                # so moved this definition up and outside the functions (see above), instead.
     precipitation = (
         session.query(Measurement.date, Measurement.prcp)   # '''SELECT date, prcp FROM Measurement
         .filter(prev_year <= Measurement.date)              # WHERE prev_year <= Measurement.date'''
@@ -121,7 +121,7 @@ def temp_monthly():
 @app.route(f"{version_prefix}/temp/<start>/<end>/")
 
 def stats(start=None, end=None):
-    # The list elements in `sel` will be used as columns in a later SQL SELECT query
+    # The list elements in `sel` will be used as columns in later SQL queries
     sel = [
         func.min(Measurement.tobs),
         func.avg(Measurement.tobs),
